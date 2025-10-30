@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include data_trimmer *.css
+recursive-include data_trimmer *.csv
+recursive-include data_trimmer *.html
+recursive-include data_trimmer *.ico
+recursive-include data_trimmer *.js
+recursive-include data_trimmer *.json
+recursive-include data_trimmer *.md
+recursive-include data_trimmer *.png
+recursive-include data_trimmer *.py
+recursive-include data_trimmer *.svg
+recursive-include data_trimmer *.txt
+recursive-exclude data_trimmer *.pyc
