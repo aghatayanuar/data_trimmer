@@ -12,10 +12,12 @@ class DataTrimmerSettings(Document):
 
 @frappe.whitelist()
 def run_data_trimmer(simulate=False, enqueue_per_doctype=True):
+    #Cek Jika Data Trim Di Disable Untuk Semua Doc
     if frappe.db.get_single_value("Data Trimmer Settings", "disabled"):
         print("Trimming disabled")
         return
 
+    #Ambil Active Rule Doc Yang Akan Di trim
     rules = frappe.get_all(
         "Data Trimmer",
         filters={"disabled": 0},
@@ -28,6 +30,7 @@ def run_data_trimmer(simulate=False, enqueue_per_doctype=True):
 
     for rule_info in rules:
         doctype_name = rule_info.document_type
+        #Enqueue per Active Doctype Biar Di Pecah Per Doctype Tidak Sekaligus
         if enqueue_per_doctype:
             frappe.enqueue(
                 "data_trimmer.data_trimmer.doctype.data_trimmer_settings.data_trimmer_settings._run_single_doctype_trim",
@@ -54,20 +57,24 @@ def _run_single_doctype_trim(rule_name, simulate=False):
 
 
 def move_data_to_archive(rule, simulate=False):
+    #Memindahkan data ke archive
     doctype = rule.document_type
     archive_prefix = rule.archive_prefix or "_Archive"
     main_table = f"tab{doctype}"
     archive_table = f"{main_table}{archive_prefix}"
 
+    #Cari Tanggal Cutoff Dari Retention Period, Jadi Yang Tersisa Hanya Jumlah Bulan di Retention
     cutoff_date = add_months(now_datetime(), -rule.retention_period)
     date_field = rule.date_field or "creation"
     batch_size = rule.batch_size or 500
 
+    #Dilakukan Prepare Tabel Archive Dulu
     frappe.db.commit()
     print(f"Ensuring archive table {archive_table} exists...")
     frappe.db.sql(f"CREATE TABLE IF NOT EXISTS `{archive_table}` LIKE `{main_table}`")
     frappe.db.commit()
 
+    #Bikin Juga Child Tabel Yang Terkait
     meta = frappe.get_meta(doctype)
     child_tables = [
         f"tab{f.options}" for f in meta.fields if f.fieldtype == "Table" and f.options
@@ -82,6 +89,7 @@ def move_data_to_archive(rule, simulate=False):
     batch_index = 0
 
     while True:
+        #Proses pindah ke archive per batch file sampai tidak tersisa row diluar retention period
         rows = frappe.db.sql(
             f"""SELECT name FROM `{main_table}`
                 WHERE `{date_field}` < %s
@@ -99,6 +107,7 @@ def move_data_to_archive(rule, simulate=False):
         batch_index += 1
         print(f"Processing batch #{batch_index}, {len(names)} records from {doctype}...")
 
+        #Simulate ini buat testing jadi ga bener2 mindah
         if simulate:
             print(f"Simulating move: would archive {len(names)} records (first: {names[0]}, last: {names[-1]})")
             total_moved += len(names)
@@ -131,6 +140,7 @@ def move_data_to_archive(rule, simulate=False):
             frappe.db.commit()
             total_moved += len(names)
 
+            #Log Yang Pindah Di Simpan Di Doctype Batch Trim Log
             frappe.get_doc({
                 "doctype": "Batch Trim Log",
                 "document_type": doctype,
@@ -153,6 +163,7 @@ def move_data_to_archive(rule, simulate=False):
 
 @frappe.whitelist()
 def enqueue_trim_job():
+    #Enqueue untuk di panggil di tombol start triming
     frappe.enqueue(
         "data_trimmer.data_trimmer.doctype.data_trimmer_settings.data_trimmer_settings.run_data_trimmer",
         queue="long",
