@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-30 11:44:40.440946",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "document_type",
+  "first_record",
+  "last_record",
+  "record_count",
+  "trimmed_by",
+  "trimmed_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Document Type",
+   "options": "DocType",
+   "read_only": 1
+  },
+  {
+   "fieldname": "first_record",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "First Record",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_record",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Last Record",
+   "read_only": 1
+  },
+  {
+   "fieldname": "record_count",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Record Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "trimmed_by",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Trimmed By",
+   "read_only": 1
+  },
+  {
+   "fieldname": "trimmed_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Trimmed On",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-10-30 11:49:31.881258",
+ "modified_by": "Administrator",
+ "module": "Data Trimmer",
+ "name": "Batch Trim Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
